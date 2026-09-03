@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpan Pinjam Putri (SPP)</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #0284c7;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: #334155;
+        }
+
+        /* RUNNING TEXT TEKS BERJALAN */
+        .announcement-bar {
+            background: linear-gradient(90deg, #0284c7 0%, #0369a1 50%, #0f172a 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            height: 38px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 100;
+        }
+
+        .announcement-badge {
+            background-color: #38bdf8;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-left: 15px;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+        }
+
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 22s linear infinite;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .marquee-text span { color: #f0f9ff; }
+        .marquee-text b { color: #7dd3fc; }
+
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        /* HEADER & LAYOUT */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo { font-size: 20px; font-weight: bold; letter-spacing: 1px; color: #f8fafc; }
+        
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .public-cash { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; font-size: 13px; }
+        .public-cash span { color: #38bdf8; font-weight: bold; }
+
+        .live-clock {
+            background: #0f172a;
+            border: 1px solid #38bdf8;
+            color: #7dd3fc;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-align: right;
+        }
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-full { width: 100%; padding: 12px; }
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-warning { background-color: var(--warning); color: white; }
+        
+        .auth-link { text-align: center; margin-top: 12px; font-size: 13px; }
+        .auth-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; display: none; font-size: 14px; line-height: 1.5; }
+        .alert-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-blue { background-color: #f0f9ff; color: #075985; border: 1px solid #bae6fd; }
+        .alert-warning { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+
+        .qris-box {
+            text-align: center;
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .qris-box img { max-width: 220px; border-radius: 8px; margin: 10px auto; border: 1px solid #cbd5e1; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+        th { background-color: #f1f5f9; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 { margin: 5px 0 0 0; color: var(--accent); font-size: 24px; }
+        .stat-card small { color: #64748b; font-weight: 600; }
+
+        .due-card {
+            background: #fffbeeb0;
+            border: 1px solid #fde68a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        /* STYLES DESAIN KWITANSI MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .kwitansi-card {
+            background: #fff;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 2px solid #0284c7;
+            position: relative;
+        }
+
+        .kwitansi-header {
+            text-align: center;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .kwitansi-header h2 { margin: 0; color: #0284c7; font-size: 20px; }
+        .kwitansi-header p { margin: 3px 0 0 0; font-size: 12px; color: #64748b; }
+
+        .kwitansi-body table { width: 100%; margin-top: 0; }
+        .kwitansi-body td { padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .kwitansi-body td:first-child { color: #64748b; font-weight: 600; }
+        .kwitansi-body td:last-child { text-align: right; font-weight: bold; }
+
+        .kwitansi-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 12px;
+        }
+
+        .stamp-box {
+            border: 2px solid #10b981;
+            color: #10b981;
+            font-weight: 900;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        /* LIVE CHAT WIDGET */
+        .chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .chat-toggle {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-box {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 320px;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #efeae2;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 13px; }
+        .msg-cs { background: white; align-self: flex-start; }
+        .msg-user { background: #dcf8c6; align-self: flex-end; }
+        .chat-input-area { display: flex; padding: 8px; background: #f0f0f0; }
+        .chat-input-area input { flex: 1; border: none; padding: 8px; border-radius: 4px; outline: none; }
+        .chat-input-area button { margin-left: 5px; padding: 8px 12px; background: #075e54; color: white; border: none; border-radius: 4px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #kwitansiModal, #kwitansiModal * { visibility: visible; }
+            #kwitansiModal { position: absolute; left: 0; top: 0; width: 100%; background: none; }
+            .no-print { display: none !important; }
+        }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; text-align: center; }
+            .header-info { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- RUNNING TEXT -->
+    <div class="announcement-bar">
+        <div class="announcement-badge">PENGUMUMAN</div>
+        <div class="marquee-container">
+            <div class="marquee-text">
+                📢 <span>Selamat datang di <b>Simpan Pinjam Putri (SPP)</b>!</span> &nbsp;•&nbsp; 
+                🆕 <span><b>Pengajuan Baru:</b> Khusus Nasabah Baru Limit Pinjaman Pertama Rp 10.000 - Rp 200.000!</span> &nbsp;•&nbsp; 
+                🧾 <span><b>Kwitansi Otomatis:</b> Terbit langsung setelah disetujui Admin beserta tanggal & jam jatuh tempo lengkap.</span> &nbsp;•&nbsp; 
+                💬 <span>CS Whatsapp Aktif: <b>082345546286</b></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">SIMPAN PINJAM PUTRI (SPP)</div>
+        <div class="header-info">
+            <div class="public-cash">
+                Kas: <span id="publicCash">Rp 50.000.000</span>
+            </div>
+            <div class="live-clock" id="liveClock">
+                Memuat waktu...
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- 1. HALAMAN AUTHENTICATION (SATU PINTU) -->
+        <div id="loginPage" class="page active">
+            <div class="card" id="formLogin" style="max-width: 420px; margin: 30px auto;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Masuk Akun SPP</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="loginUsername" placeholder="Masukkan User ID Anda" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" minlength="5" placeholder="Masukkan password" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Masuk Ke Sistem</button>
+                </form>
+                <div class="auth-link">
+                    Belum punya akun? <a href="#" onclick="switchAuthForm('register')">Daftar Sekarang</a><br><br>
+                    <a href="#" onclick="switchAuthForm('forgot')">Lupa Password?</a>
+                </div>
+            </div>
+
+            <!-- FORM REGISTRASI NASABAH BARU -->
+            <div class="card" id="formRegister" style="max-width: 480px; margin: 30px auto; display: none;">
+                <h2 style="text-align: center; margin-bottom: 10px;">Pendaftaran Nasabah Baru</h2>
+                <p style="text-align: center; font-size:12px; color:var(--accent); margin-top:0;">*Nasabah Baru Mendapatkan Limit Pinjaman Awal Rp 10.000 - Rp 200.000</p>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>User ID Nasabah (Maksimal 7 Karakter)</label>
+                        <input type="text" id="regUserId" maxlength="7" placeholder="Contoh: Budi123" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor WhatsApp Aktif</label>
+                        <input type="tel" id="regWa" placeholder="08xxxxxxxxxx" minlength="10" maxlength="14" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Pemilik Rekening / E-Wallet</label>
+                        <input type="text" id="regBankName" placeholder="Masukkan nama sesuai rekening" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pencairan Dana (Bank / E-Wallet)</label>
+                        <select id="regBankType" required>
+                            <option value="">-- Pilih Metode Pencairan --</option>
+                            <option value="DANA">DANA</option>
+                            <option value="OVO">OVO</option>
+                            <option value="GOPAY">GoPay</option>
+                            <option value="BCA">Bank BCA</option>
+                            <option value="MANDIRI">Bank Mandiri</option>
+                            <option value="BRI">Bank BRI</option>
+                            <option value="BNI">Bank BNI</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Rekening / Nomor E-Wallet</label>
+                        <input type="number" id="regBankNo" placeholder="Nomor rekening atau HP E-wallet" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password (Minimal 5 Karakter)</label>
+                        <input type="password" id="regPassword" minlength="5" placeholder="Buat password baru" required>
+                    </div>
+                    <button type="submit" class="btn-success btn-full">Daftar Akun Baru</button>
+                </form>
+                <div class="auth-link">
+                    Sudah punya akun? <a href="#" onclick="switchAuthForm('login')">Masuk di sini</a>
+                </div>
+            </div>
+
+            <!-- FORM LUPA PASSWORD -->
+            <div class="card" id="formForgot" style="max-width: 420px; margin: 30px auto; display: none;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Reset Password</h2>
+                <form id="forgotForm">
+                    <div class="form-group">
+                        <label>User ID Terdaftar</label>
+                        <input type="text" id="forgotUserId" placeholder="Masukkan User ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Pemilik Rekening Terdaftar</label>
+                        <input type="text" id="forgotName" placeholder="Masukkan nama sesuai rekening" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password Baru (Minimal 5 Karakter)</label>
+                        <input type="password" id="forgotNewPass" minlength="5" placeholder="Masukkan password baru" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Reset Password</button>
+                </form>
+                <div class="auth-link">
+                    Kembali ke <a href="#" onclick="switchAuthForm('login')">Halaman Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. DASHBOARD NASABAH -->
+        <div id="nasabahPage" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h3 style="margin: 0;">Selamat Datang, <span id="nasabahName">Nasabah</span></h3>
+                    <small style="color: #64748b;" id="nasabahBankInfo"></small>
+                </div>
+                <button onclick="logout()" class="btn-danger">Keluar</button>
+            </div>
+
+            <!-- BANTUAN CS -->
+            <div class="card" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border: 1px solid #38bdf8; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h4 style="margin:0; color:#0369a1;">Butuh Bantuan Langsung?</h4>
+                    <p style="margin:5px 0 0 0; font-size:13px; color:#0c4a6e;">Hubungi Customer Service resmi SPP melalui WhatsApp.</p>
+                </div>
+                <a href="https://wa.me/6282345546286?text=Halo%20CS%20SPP,%20saya%20butuh%20bantuan" target="_blank" style="text-decoration:none;">
+                    <button class="btn-success" style="background:#25d366; display:flex; align-items:center; gap:5px;">
+                        💬 Hubungi CS WA (082345546286)
+                    </button>
+                </a>
+            </div>
+
+            <!-- STATUS INFORMASI RESMI & PROFESIONAL -->
+            <div id="statusAlertPending" class="alert alert-warning">
+                ⏳ <b>Pengajuan Dalam Proses:</b> Pengajuan Anda telah berhasil dikirim dan sedang dalam proses verifikasi oleh tim analisis SPP. Mohon menunggu konfirmasi Admin.
+            </div>
+            <div id="statusAlertRejected" class="alert alert-red">
+                ❌ <b>Pengajuan Ditolak:</b> Mohon maaf, pengajuan pinjaman Anda saat ini belum dapat disetujui karena tidak memenuhi kualifikasi limit kredit atau persyaratan evaluasi risiko SPP. Silakan coba kembali di periode berikutnya.
+            </div>
+            <div id="statusAlertApproved" class="alert alert-blue">
+                ✅ <b>Pengajuan Disetujui:</b> Selamat! Pengajuan pinjaman Anda telah disetujui dan berhasil diproses. Silakan cek rincian pencairan serta tanggal jatuh tempo di bawah ini.
+            </div>
+
+            <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div>
+                    <small>Limit Pinjaman Anda</small>
+                    <h2 id="userLimit" style="color: var(--accent); margin: 5px 0;">Rp 200.000</h2>
+                    <small id="userStatusTag" style="color:#0284c7; font-weight:bold;">(Nasabah Baru)</small>
+                </div>
+                <div>
+                    <small>Sisa Total Tagihan (+ Bunga)</small>
+                    <h2 id="userBill" style="color: var(--danger); margin: 5px 0;">Rp 0</h2>
+                </div>
+                <div>
+                    <small>Denda Keterlambatan (Rp 5.000/hari)</small>
+                    <h2 id="userFine" style="color: var(--warning); margin: 5px 0;">Rp 0</h2>
+                </div>
+            </div>
+
+            <!-- DETAIL FITUR JATUH TEMPO NASABAH -->
+            <div class="due-card" id="dueDateSection" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="margin:0; color: #b45309;">📅 RINCIAN JATUH TEMPO & BUKTI PINJAMAN</h4>
+                    <button onclick="openKwitansiModal()" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">🧾 Cetak / Lihat Kwitansi</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>Tanggal & Jam Disetujui: <b id="approveDateText">-</b></div>
+                    <div>Jatuh Tempo: <b id="dueDateText" style="color: var(--danger);">-</b></div>
+                    <div>Status Waktu: <b id="lateStatusText" style="color: var(--success);">Lancar</b></div>
+                </div>
+            </div>
+
+            <!-- FORM PENGAJUAN PINJAMAN BERDASARKAN PAKET -->
+            <div class="card">
+                <h3>Form Pengajuan Pinjaman & Paket</h3>
+                <form id="loanForm">
+                    <div class="form-group">
+                        <label>Pilih Paket Pinjaman</label>
+                        <select id="loanPackage" onchange="updatePackageOptions()" required>
+                            <option value="mingguan">Paket Mingguan (Rp 10.000 - Rp 500.000)</option>
+                            <option value="bulanan">Paket Bulanan (Rp 600.000 - Rp 5.000.000)</option>
+                            <option value="tahunan">Paket Tahunan (Rp 6.000.000 - Rp 10.000.000)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pilih Tenor Durasi</label>
+                        <select id="loanTenor" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nominal Pinjaman (Rp)</label>
+                        <input type="number" id="loanAmount" placeholder="Masukkan nominal" required>
+                        <small id="packageNote" style="color: #64748b; font-size:12px;"></small>
+                    </div>
+
+                    <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                        <div>Bunga Flat: <b>50%</b></div>
+                        <div>Total Pengembalian: <b id="calcTotal" style="color: var(--accent);">Rp 0</b></div>
+                    </div>
+                    <button type="submit" id="btnApply" class="btn-primary btn-full">Kirim Pengajuan Pinjaman</button>
+                </form>
+            </div>
+
+            <!-- BAGIAN BAYAR / CICIL VIA QRIS -->
+            <div class="card" id="qrisSection" style="display: none;">
+                <h3>Pelunasan atau Cicilan Tagihan Wajib QRIS</h3>
+                <div class="qris-box">
+                    <p>Scan Kode QRIS di bawah ini menggunakan E-Wallet atau Mobile Banking:</p>
+                    <img id="displayQrisImg" src="https://via.placeholder.com/220x220?text=QRIS+SPP+RESMI" alt="QRIS Code">
+                    
+                    <div style="background:#e0f2fe; padding:12px; border-radius:8px; margin:15px 0; font-size:14px;">
+                        <div>Total Tagihan Keseluruhan (+ Denda): <b id="qrisTotalPay" style="color: var(--danger);">Rp 0</b></div>
+                    </div>
+
+                    <div style="max-width: 350px; margin: 0 auto 15px auto; text-align: left;">
+                        <label>Nominal Bayar / Cicil (Minimal Rp 50.000):</label>
+                        <input type="number" id="payCustomAmount" placeholder="Masukkan nominal bayar" min="50000" style="margin-top:5px;">
+                        <small style="color: #64748b; font-size:11px;">*Kosongkan jika ingin pelunasan penuh sesuai total tagihan.</small>
+                    </div>
+
+                    <div>
+                        <button onclick="submitPayment()" class="btn-success">Konfirmasi Sudah Bayar / Cicil QRIS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. DASHBOARD ADMIN -->
+        <div id="adminPage" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Pusat Kontrol Rahasia Admin SPP</h2>
+                <button onclick="logout()" class="btn-danger">Keluar</button>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <small>TOTAL NASABAH TERDAFTAR</small>
+                    <h3 id="statTotalUsers">0 Orang</h3>
+                </div>
+                <div class="stat-card">
+                    <small>PINJAMAN AKTIF</small>
+                    <h3 id="statActiveLoans" style="color: var(--warning);">0 Nasabah</h3>
+                </div>
+                <div class="stat-card">
+                    <small>MENUNGGU PERSETUJUAN</small>
+                    <h3 id="statPendingLoans" style="color: var(--danger);">0 Pengajuan</h3>
+                </div>
+            </div>
+
+            <!-- PENGATURAN KAS & QRIS -->
+            <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div>
+                    <h3>Kelola Kas Perusahaan</h3>
+                    <div class="form-group">
+                        <input type="number" id="adminCashInput" placeholder="Masukkan nominal kas baru">
+                    </div>
+                    <button onclick="updateCompanyCash()" class="btn-primary">Update Kas</button>
+                </div>
+                <div>
+                    <h3>Update Gambar QRIS</h3>
+                    <div class="form-group">
+                        <input type="text" id="adminQrisUrlInput" placeholder="URL Gambar QRIS (.png / .jpg)">
+                    </div>
+                    <button onclick="updateQrisUrl()" class="btn-success">Update URL QRIS</button>
+                </div>
+            </div>
+
+            <!-- TABEL 1: PERSETUJUAN PINJAMAN -->
+            <div class="card">
+                <h3>Pusat Persetujuan Pinjaman (Approval Center)</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User ID / WA</th>
+                                <th>Paket & Tenor</th>
+                                <th>Nominal Pinjam</th>
+                                <th>Total (+Bunga 50%)</th>
+                                <th>Aksi Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminApprovalTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABEL 2: VERIFIKASI QRIS & CICILAN -->
+            <div class="card">
+                <h3>Konfirmasi Pelunasan / Cicilan QRIS Nasabah</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nasabah</th>
+                                <th>Nominal Disetor</th>
+                                <th>Sisa Tagihan Sekarang</th>
+                                <th>Aksi Eksekusi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminPaymentTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABEL 3: MASTER DATA & STATUS NASABAH -->
+            <div class="card">
+                <h3>Master Data & Status Jatuh Tempo Nasabah</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Pemilik Rekening</th>
+                                <th>User ID / WhatsApp</th>
+                                <th>Sisa Tagihan (+Denda)</th>
+                                <th>Jatuh Tempo</th>
+                                <th>Status Nasabah</th>
+                                <th>Aksi Kelola Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminMasterUserTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL POPUP KWITANSI PEMBAYARAN AUTOMATIS -->
+    <div class="modal-overlay" id="kwitansiModal">
+        <div class="kwitansi-card">
+            <div class="kwitansi-header">
+                <h2>SIMPAN PINJAM PUTRI (SPP)</h2>
+                <p>Kwitansi Bukti Pencairan Pinjaman Resmi</p>
+                <small id="kwitansiNo" style="font-family: monospace; color:#0284c7;"></small>
+            </div>
+            <div class="kwitansi-body">
+                <table>
+                    <tr>
+                        <td>Nama Rekening Nasabah</td>
+                        <td id="kwitansiName">-</td>
+                    </tr>
+                    <tr>
+                        <td>User ID / WA</td>
+                        <td id="kwitansiWa">-</td>
+                    </tr>
+                    <tr>
+                        <td>Metode Pencairan</td>
+                        <td id="kwitansiBankInfo">-</td>
+                    </tr>
+                    <tr>
+                        <td>Paket & Tenor</td>
+                        <td id="kwitansiPackageTenor">-</td>
+                    </tr>
+                    <tr>
+                        <td>Nominal Pinjaman Pokok</td>
+                        <td id="kwitansiPrincipal" style="color:#0284c7;">-</td>
+                    </tr>
+                    <tr>
+                        <td>Bunga Pinjaman (50%)</td>
+                        <td id="kwitansiInterest">-</td>
+                    </tr>
+                    <tr>
+                        <td>Total Pengembalian</td>
+                        <td id="kwitansiTotal" style="color:#ef4444;">-</td>
+                    </tr>
+                    <tr>
+                        <td>Waktu Pencairan (Disetujui)</td>
+                        <td id="kwitansiApproveTime" style="color:#10b981;">-</td>
+                    </tr>
+                    <tr>
+                        <td>Batas Tanggal Jatuh Tempo</td>
+                        <td id="kwitansiDueTime" style="color:#ef4444;">-</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="kwitansi-footer">
+                <div>
+                    <small>Dicetak Otomatis Oleh Sistem SPP</small><br>
+                    <small>Status: <b>DISETUJUI & CAIR</b></small>
+                </div>
+                <div class="stamp-box">LUNAS CAIR</div>
+            </div>
+            <div style="margin-top:20px; display:flex; gap:10px;" class="no-print">
+                <button onclick="window.print()" class="btn-success btn-full">🖨️ Cetak / Save PDF</button>
+                <button onclick="closeKwitansiModal()" class="btn-danger btn-full">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIDGET LIVE CHAT CUSTOMER SERVICE -->
+    <div class="chat-widget" id="chatWidget" style="display: none;">
+        <button class="chat-toggle" onclick="toggleChat()">
+            💬 Live Chat CS
+        </button>
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header">
+                <span>CS Simpan Pinjam Putri</span>
+                <span style="cursor:pointer;" onclick="toggleChat()">✖</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg msg-cs">Halo! Ada yang bisa CS bantu terkait pengajuan, kwitansi, atau cicilan SPP?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Ketik pesan..." onkeypress="handleChatKey(event)">
+                <button onclick="sendChatMessage()">Kirim</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FUNCTION JAM REAL-TIME DI POJOK KANAN
+        function updateLiveClock() {
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            let dayName = days[now.getDay()];
+            let dayNum = now.getDate();
+            let monthName = months[now.getMonth()];
+            let year = now.getFullYear();
+
+            let hours = String(now.getHours()).padStart(2, '0');
+            let minutes = String(now.getMinutes()).padStart(2, '0');
+            let seconds = String(now.getSeconds()).padStart(2, '0');
+
+            let formattedString = `${dayName}, ${dayNum} ${monthName} ${year}<br>🕒 ${hours}:${minutes}:${seconds} WIB`;
+            document.getElementById('liveClock').innerHTML = formattedString;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        // INIT DATA STORAGE PERSISTEN
+        let companyCash = parseFloat(localStorage.getItem('SPP_CASH')) || 50000000;
+        let qrisImgUrl = localStorage.getItem('SPP_QRIS') || 'https://via.placeholder.com/220x220?text=QRIS+SPP+RESMI';
+        let activeUser = null;
+
+        let defaultUsers = {
+            'Budi01': {
+                password: 'user123',
+                wa: '081234567890',
+                name: 'BUDI SANTOSO',
+                bankType: 'DANA',
+                bankNo: '081234567890',
+                bankName: 'BUDI SANTOSO',
+                limit: 200000,
+                isNewUser: true,
+                activeLoan: 0,
+                bunga: 0,
+                denda: 0,
+                status: 'clean',
+                selectedPackage: '',
+                selectedTenor: '',
+                approveDate: null,
+                dueDate: null,
+                paySubmitAmount: 0
+            }
+        };
+
+        let usersData = JSON.parse(localStorage.getItem('SPP_USERS')) || defaultUsers;
+
+        function saveDataToStorage() {
+            localStorage.setItem('SPP_USERS', JSON.stringify(usersData));
+            localStorage.setItem('SPP_CASH', companyCash.toString());
+            localStorage.setItem('SPP_QRIS', qrisImgUrl);
+        }
+
+        function switchAuthForm(formType) {
+            document.getElementById('formLogin').style.display = 'none';
+            document.getElementById('formRegister').style.display = 'none';
+            document.getElementById('formForgot').style.display = 'none';
+
+            if (formType === 'login') document.getElementById('formLogin').style.display = 'block';
+            if (formType === 'register') document.getElementById('formRegister').style.display = 'block';
+            if (formType === 'forgot') document.getElementById('formForgot').style.display = 'block';
+        }
+
+        // PENGATURAN DROPDOWN PAKET DAN TENOR
+        function updatePackageOptions() {
+            let pkg = document.getElementById('loanPackage').value;
+            let tenorSelect = document.getElementById('loanTenor');
+            let packageNote = document.getElementById('packageNote');
+            tenorSelect.innerHTML = '';
+
+            if (pkg === 'mingguan') {
+                packageNote.innerText = '*Nominal Min: Rp 10.000 | Max: Rp 500.000';
+                tenorSelect.innerHTML += '<option value="1 Minggu">1 Minggu</option>';
+                tenorSelect.innerHTML += '<option value="2 Minggu">2 Minggu</option>';
+                tenorSelect.innerHTML += '<option value="3 Minggu">3 Minggu</option>';
+                tenorSelect.innerHTML += '<option value="4 Minggu">4 Minggu</option>';
+            } else if (pkg === 'bulanan') {
+                packageNote.innerText = '*Nominal Min: Rp 600.000 | Max: Rp 5.000.000';
+                for (let i = 1; i <= 12; i++) {
+                    tenorSelect.innerHTML += `<option value="${i} Bulan">${i} Bulan</option>`;
+                }
+            } else if (pkg === 'tahunan') {
+                packageNote.innerText = '*Nominal Min: Rp 6.000.000 | Max: Rp 10.000.000';
+                tenorSelect.innerHTML += '<option value="1 Tahun">1 Tahun</option>';
+                tenorSelect.innerHTML += '<option value="2 Tahun">2 Tahun</option>';
+                tenorSelect.innerHTML += '<option value="3 Tahun">3 Tahun</option>';
+            }
+            calculateTotalDisplay();
+        }
+
+        document.getElementById('loanAmount').addEventListener('input', calculateTotalDisplay);
+
+        function calculateTotalDisplay() {
+            let amount = parseFloat(document.getElementById('loanAmount').value) || 0;
+            let total = amount + (amount * 0.5);
+            document.getElementById('calcTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+        }
+
+        // REGISTRASI NASABAH BARU (MAX USER ID 7 KARAKTER, PASS MIN 5 KARAKTER)
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let userId = document.getElementById('regUserId').value.trim();
+            let wa = document.getElementById('regWa').value.trim();
+            let bankType = document.getElementById('regBankType').value;
+            let bankNo = document.getElementById('regBankNo').value.trim();
+            let bankName = document.getElementById('regBankName').value.trim();
+            let password = document.getElementById('regPassword').value;
+
+            if (userId.length > 7) {
+                alert('❌ User ID Nasabah maksimal 7 karakter!');
+                return;
+            }
+
+            if (password.length < 5) {
+                alert('❌ Password minimal 5 karakter!');
+                return;
+            }
+
+            if (usersData[userId] || userId === 'SPPADMINHK') {
+                alert('User ID sudah terdaftar! Gunakan User ID lain.');
+                return;
+            }
+
+            usersData[userId] = {
+                password: password,
+                wa: wa,
+                name: bankName.toUpperCase(),
+                bankType: bankType,
+                bankNo: bankNo,
+                bankName: bankName.toUpperCase(),
+                limit: 200000,
+                isNewUser: true,
+                activeLoan: 0,
+                bunga: 0,
+                denda: 0,
+                status: 'clean',
+                selectedPackage: '',
+                selectedTenor: '',
+                approveDate: null,
+                dueDate: null,
+                paySubmitAmount: 0
+            };
+
+            saveDataToStorage();
+            alert('✅ PENDAFTARAN BERHASIL!\n\nUser ID: ' + userId + '\nAnda terdaftar sebagai Nasabah Baru dengan limit Rp 200.000. Silakan login.');
+            document.getElementById('registerForm').reset();
+            switchAuthForm('login');
+        });
+
+        // RESET PASSWORD NASABAH
+        document.getElementById('forgotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let userId = document.getElementById('forgotUserId').value.trim();
+            let name = document.getElementById('forgotName').value.trim().toUpperCase();
+            let newPass = document.getElementById('forgotNewPass').value;
+
+            if (newPass.length < 5) {
+                alert('❌ Password baru minimal 5 karakter!');
+                return;
+            }
+
+            if (usersData[userId] && usersData[userId].name === name) {
+                usersData[userId].password = newPass;
+                saveDataToStorage();
+                alert('✅ Password berhasil diperbarui! Silakan login dengan password baru.');
+                document.getElementById('forgotForm').reset();
+                switchAuthForm('login');
+            } else {
+                alert('❌ Data tidak cocok! User ID atau Nama Pemilik Rekening salah.');
+            }
+        });
+
+        // SYSTEM LOGIN 1 PINTU
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let u = document.getElementById('loginUsername').value.trim();
+            let p = document.getElementById('loginPassword').value;
+
+            // 1. CEK KHUSUS ADMIN
+            if (u === 'SPPADMINHK' && p === 'ADMINSPP2026HK') {
+                activeUser = 'ADMIN';
+                document.getElementById('chatWidget').style.display = 'none';
+                showPage('adminPage');
+                renderAdminView();
+            } 
+            // 2. CEK NASABAH
+            else if (usersData[u] && usersData[u].password === p) {
+                activeUser = u;
+                document.getElementById('chatWidget').style.display = 'block';
+                showPage('nasabahPage');
+                updatePackageOptions();
+                renderNasabahView();
+            } else {
+                alert('User ID atau Password Salah!');
+            }
+        });
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function logout() {
+            activeUser = null;
+            document.getElementById('chatWidget').style.display = 'none';
+            document.getElementById('loginForm').reset();
+            switchAuthForm('login');
+            showPage('loginPage');
+        }
+
+        // PERHITUNGAN OTOMATIS JATUH TEMPO & DENDA
+        function checkUserOverdue(u) {
+            if (u.dueDate && u.status === 'approved') {
+                let now = new Date().getTime();
+                let parts = u.dueDate.split(', ');
+                if (parts.length > 1) {
+                    let dateParts = parts[0].split('/');
+                    let timeParts = parts[1].split(':');
+                    let dueObj = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1]);
+                    
+                    if (now > dueObj.getTime()) {
+                        let diffDays = Math.ceil((now - dueObj.getTime()) / (1000 * 3600 * 24));
+                        u.denda = diffDays * 5000;
+                    } else {
+                        u.denda = 0;
+                    }
+                }
+            }
+        }
+
+        // NASABAH VIEW DENGAN ALUR STATUS PENGAJUAN PROFESIONAL
+        function renderNasabahView() {
+            let u = usersData[activeUser];
+            checkUserOverdue(u);
+
+            document.getElementById('nasabahName').innerText = u.name;
+            document.getElementById('nasabahBankInfo').innerText = u.bankType + ' - ' + u.bankNo + ' a.n ' + u.bankName;
+            document.getElementById('userLimit').innerText = 'Rp ' + u.limit.toLocaleString('id-ID');
+            document.getElementById('userStatusTag').innerText = u.isNewUser ? '(Nasabah Baru)' : '(Nasabah Lama / Setia)';
+            document.getElementById('displayQrisImg').src = qrisImgUrl;
+
+            let sisaTagihan = u.activeLoan + u.bunga;
+            let totalPlusDenda = sisaTagihan + u.denda;
+
+            document.getElementById('userBill').innerText = 'Rp ' + sisaTagihan.toLocaleString('id-ID');
+            document.getElementById('userFine').innerText = 'Rp ' + u.denda.toLocaleString('id-ID');
+            
+            let alertPending = document.getElementById('statusAlertPending');
+            let alertRejected = document.getElementById('statusAlertRejected');
+            let alertApproved = document.getElementById('statusAlertApproved');
+            
+            let qrisSec = document.getElementById('qrisSection');
+            let btnApply = document.getElementById('btnApply');
+            let dueSec = document.getElementById('dueDateSection');
+
+            // RESET ALERTS
+            alertPending.style.display = 'none';
+            alertRejected.style.display = 'none';
+            alertApproved.style.display = 'none';
+
+            if (u.status === 'pending') {
+                // SEMENTARA MENUNGGU VERIFIKASI ADMIN
+                alertPending.style.display = 'block';
+                btnApply.disabled = true;
+                btnApply.style.opacity = '0.5';
+                qrisSec.style.display = 'none';
+                dueSec.style.display = 'none';
+            } else if (u.status === 'rejected') {
+                // DI TOLAK ADMIN
+                alertRejected.style.display = 'block';
+                btnApply.disabled = false;
+                btnApply.style.opacity = '1';
+                qrisSec.style.display = 'none';
+                dueSec.style.display = 'none';
+            } else if (u.status === 'approved' || u.status === 'paid_pending') {
+                // DI SETUJUI ADMIN
+                alertApproved.style.display = 'block';
+                btnApply.disabled = true;
+                btnApply.style.opacity = '0.5';
+                qrisSec.style.display = 'block';
+                dueSec.style.display = 'block';
+                
+                document.getElementById('qrisTotalPay').innerText = 'Rp ' + totalPlusDenda.toLocaleString('id-ID');
+                document.getElementById('approveDateText').innerText = u.approveDate || '-';
+                document.getElementById('dueDateText').innerText = u.dueDate || '-';
+                
+                if (u.denda > 0) {
+                    document.getElementById('lateStatusText').innerHTML = '<span style="color:var(--danger);">⚠️ TERLAMBAT (' + (u.denda/5000) + ' Hari)</span>';
+                } else {
+                    document.getElementById('lateStatusText').innerHTML = '<span style="color:var(--success);">✅ LANCAR</span>';
+                }
+            } else {
+                // STATUS CLEAN / BARU
+                btnApply.disabled = false;
+                btnApply.style.opacity = '1';
+                qrisSec.style.display = 'none';
+                dueSec.style.display = 'none';
+            }
+        }
+
+        // PENGAJUAN PINJAMAN BERHASIL DIKIRIM (MENUNGGU PROSES)
+        document.getElementById('loanForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let amount = parseFloat(document.getElementById('loanAmount').value);
+            let pkg = document.getElementById('loanPackage').value;
+            let tenor = document.getElementById('loanTenor').value;
+            let u = usersData[activeUser];
+
+            if (u.isNewUser && amount > 200000) {
+                alert("Maaf, sebagai nasabah baru Anda hanya diperbolehkan mengajukan pinjaman maksimal hingga Rp 200.000!");
+                return;
+            }
+
+            if (amount > u.limit) {
+                alert('Pengajuan melebihi limit aktif Anda (Rp ' + u.limit.toLocaleString('id-ID') + ')!');
+                return;
+            }
+
+            if (pkg === 'mingguan' && (amount < 10000 || amount > 500000)) {
+                alert('❌ Untuk Paket Mingguan, nominal pinjaman harus antara Rp 10.000 s/d Rp 500.000!');
+                return;
+            }
+            if (pkg === 'bulanan' && (amount < 600000 || amount > 5000000)) {
+                alert('❌ Untuk Paket Bulanan, nominal pinjaman harus antara Rp 600.000 s/d Rp 5.000.000!');
+                return;
+            }
+            if (pkg === 'tahunan' && (amount < 6000000 || amount > 10000000)) {
+                alert('❌ Untuk Paket Tahunan, nominal pinjaman harus antara Rp 6.000.000 s/d Rp 10.000.000!');
+                return;
+            }
+
+            if (amount > companyCash) {
+                alert('Dana kas perusahaan sedang tidak mencukupi!');
+                return;
+            }
+
+            u.activeLoan = amount;
+            u.bunga = amount * 0.5;
+            u.selectedPackage = pkg.toUpperCase();
+            u.selectedTenor = tenor;
+            u.status = 'pending';
+
+            saveDataToStorage();
+            alert('📩 Pengajuan Anda telah berhasil dikirim! Mohon menunggu proses verifikasi dari pihak Admin.');
+            document.getElementById('loanForm').reset();
+            renderNasabahView();
+        });
+
+        // PROSES BAYAR / CICIL NASABAH
+        function submitPayment() {
+            let u = usersData[activeUser];
+            let customPayInput = parseFloat(document.getElementById('payCustomAmount').value);
+            let totalAll = u.activeLoan + u.bunga + u.denda;
+
+            let payAmount = customPayInput || totalAll;
+
+            if (payAmount < 50000) {
+                alert('❌ Pembayaran/Cicilan minimal adalah Rp 50.000!');
+                return;
+            }
+
+            if (payAmount > totalAll) {
+                alert('Nominal pembayaran melebihi total sisa tagihan (Rp ' + totalAll.toLocaleString('id-ID') + ')!');
+                return;
+            }
+
+            u.paySubmitAmount = payAmount;
+            u.status = 'paid_pending';
+
+            saveDataToStorage();
+            alert('✅ Konfirmasi Pembayaran/Cicilan sebesar Rp ' + payAmount.toLocaleString('id-ID') + ' telah dikirim ke Admin!');
+            document.getElementById('payCustomAmount').value = '';
+            renderNasabahView();
+        }
+
+        // ADMIN VIEW
+        function renderAdminView() {
+            document.getElementById('publicCash').innerText = 'Rp ' + companyCash.toLocaleString('id-ID');
+            
+            let approvalTbody = document.getElementById('adminApprovalTable');
+            let paymentTbody = document.getElementById('adminPaymentTable');
+            let masterTbody = document.getElementById('adminMasterUserTable');
+            
+            approvalTbody.innerHTML = '';
+            paymentTbody.innerHTML = '';
+            masterTbody.innerHTML = '';
+
+            let totalUsersCount = 0;
+            let activeLoansCount = 0;
+            let pendingLoansCount = 0;
+
+            for (let userId in usersData) {
+                let u = usersData[userId];
+                checkUserOverdue(u);
+                totalUsersCount++;
+
+                if (u.status === 'approved') activeLoansCount++;
+                if (u.status === 'pending') pendingLoansCount++;
+
+                if (u.status === 'pending') {
+                    let total = u.activeLoan + u.bunga;
+                    approvalTbody.innerHTML += `
+                        <tr>
+                            <td><b>${u.name}</b><br><small>ID: ${userId} | WA: ${u.wa || '-'}</small></td>
+                            <td><b style="color:var(--accent);">${u.selectedPackage}</b><br><small>${u.selectedTenor}</small></td>
+                            <td>Rp ${u.activeLoan.toLocaleString('id-ID')}</td>
+                            <td>Rp ${total.toLocaleString('id-ID')}</td>
+                            <td>
+                                <button onclick="approveLoan('${userId}')" class="btn-success">Setujui</button>
+                                <button onclick="rejectLoan('${userId}')" class="btn-danger">Tolak</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                if (u.status === 'paid_pending') {
+                    let sisa = (u.activeLoan + u.bunga + u.denda);
+                    paymentTbody.innerHTML += `
+                        <tr>
+                            <td><b>${u.name}</b><br><small>ID: ${userId}</small></td>
+                            <td><b style="color:var(--success);">Rp ${u.paySubmitAmount.toLocaleString('id-ID')}</b></td>
+                            <td>Rp ${sisa.toLocaleString('id-ID')}</td>
+                            <td>
+                                <button onclick="confirmPaymentAdmin('${userId}')" class="btn-success">Konfirmasi Setoran</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                let statusBadge = '<span style="color: var(--success); font-weight: bold;">Bersih</span>';
+                if (u.status === 'pending') statusBadge = '<span style="color: var(--warning); font-weight: bold;">Menunggu Pinjaman</span>';
+                if (u.status === 'approved') statusBadge = '<span style="color: var(--danger); font-weight: bold;">Pinjaman Aktif</span>';
+                if (u.status === 'paid_pending') statusBadge = '<span style="color: var(--accent); font-weight: bold;">Menunggu Verifikasi</span>';
+                if (u.status === 'rejected') statusBadge = '<span style="color: var(--danger); font-weight: bold;">Ditolak</span>';
+
+                let sisaTagihanTotal = u.activeLoan + u.bunga + u.denda;
+                let userTypeLabel = u.isNewUser ? '<small style="color:orange;">[Baru]</small>' : '<small style="color:green;">[Lama]</small>';
+
+                masterTbody.innerHTML += `
+                    <tr>
+                        <td><b>${u.name}</b> ${userTypeLabel}</td>
+                        <td><b>${userId}</b><br><small>${u.wa || '-'}</small></td>
+                        <td><b>Rp ${sisaTagihanTotal.toLocaleString('id-ID')}</b></td>
+                        <td><small>${u.dueDate || '-'}</small></td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="editUserPassword('${userId}')" class="btn-warning" style="font-size:11px; padding:4px 8px;">Edit Pass</button>
+                            <button onclick="resetUserPassword('${userId}')" class="btn-primary" style="font-size:11px; padding:4px 8px;">Reset Pass</button>
+                            <button onclick="deleteUser('${userId}')" class="btn-danger" style="font-size:11px; padding:4px 8px;">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            document.getElementById('statTotalUsers').innerText = totalUsersCount + ' Orang';
+            document.getElementById('statActiveLoans').innerText = activeLoansCount + ' Nasabah';
+            document.getElementById('statPendingLoans').innerText = pendingLoansCount + ' Pengajuan';
+        }
+
+        // AKSI APPROVAL ADMIN
+        function approveLoan(userId) {
+            let u = usersData[userId];
+            u.status = 'approved';
+            companyCash -= u.activeLoan;
+
+            let now = new Date();
+            let due = new Date();
+
+            let tenorStr = u.selectedTenor || '2 Minggu';
+            let num = parseInt(tenorStr) || 1;
+
+            if (tenorStr.includes('Minggu')) {
+                due.setDate(now.getDate() + (num * 7));
+            } else if (tenorStr.includes('Bulan')) {
+                due.setMonth(now.getMonth() + num);
+            } else if (tenorStr.includes('Tahun')) {
+                due.setFullYear(now.getFullYear() + num);
+            } else {
+                due.setDate(now.getDate() + 14);
+            }
+
+            let formatTime = (d) => {
+                let day = String(d.getDate()).padStart(2, '0');
+                let month = String(d.getMonth() + 1).padStart(2, '0');
+                let year = d.getFullYear();
+                let hrs = String(d.getHours()).padStart(2, '0');
+                let min = String(d.getMinutes()).padStart(2, '0');
+                return `${day}/${month}/${year}, ${hrs}:${min} WIB`;
+            };
+
+            u.approveDate = formatTime(now);
+            u.dueDate = formatTime(due);
+
+            saveDataToStorage();
+            alert('✅ Pengajuan Disetujui!\nStatus nasabah telah diubah menjadi Disetujui.');
+            renderAdminView();
+        }
+
+        function rejectLoan(userId) {
+            let u = usersData[userId];
+            u.activeLoan = 0;
+            u.bunga = 0;
+            u.status = 'rejected';
+            saveDataToStorage();
+            alert('❌ Pengajuan berhasil Ditolak!');
+            renderAdminView();
+        }
+
+        // KONFIRMASI PEMBAYARAN & PENAIKAN LIMIT SETELAH PELUNASAN AWAL
+        function confirmPaymentAdmin(userId) {
+            let u = usersData[userId];
+            let pay = u.paySubmitAmount;
+
+            companyCash += pay;
+
+            if (u.denda > 0) {
+                if (pay >= u.denda) {
+                    pay -= u.denda;
+                    u.denda = 0;
+                } else {
+                    u.denda -= pay;
+                    pay = 0;
+                }
+            }
+
+            let remainingBill = u.activeLoan + u.bunga;
+            if (pay > 0) {
+                remainingBill -= pay;
+                if (remainingBill <= 0) {
+                    u.activeLoan = 0;
+                    u.bunga = 0;
+                } else {
+                    u.activeLoan = remainingBill / 1.5;
+                    u.bunga = remainingBill - u.activeLoan;
+                }
+            }
+
+            if (u.activeLoan === 0 && u.bunga === 0 && u.denda === 0) {
+                if (u.isNewUser) {
+                    u.isNewUser = false;
+                    u.limit = 500000;
+                    alert('🎉 PELUNASAN AWAL LUNAS TOTAL!\n\nStatus nasabah ' + u.name + ' telah ditingkatkan. Limit pengajuan berikutnya dinaikkan menjadi Rp 500.000!');
+                } else {
+                    u.limit += (u.limit * 0.25);
+                    alert('✅ Setoran dikonfirmasi! Tagihan nasabah LUNAS TOTAL & Limit otomatis dinaikkan.');
+                }
+                u.status = 'clean';
+                u.approveDate = null;
+                u.dueDate = null;
+            } else {
+                u.status = 'approved';
+                alert('✅ Cicilan dikonfirmasi! Sisa tagihan nasabah kini: Rp ' + (u.activeLoan + u.bunga + u.denda).toLocaleString('id-ID'));
+            }
+
+            u.paySubmitAmount = 0;
+            saveDataToStorage();
+            renderAdminView();
+        }
+
+        // POPUP KWITANSI OTOMATIS
+        function openKwitansiModal() {
+            let u = usersData[activeUser];
+            if (!u || u.activeLoan === 0) {
+                alert('Belum ada transaksi pinjaman aktif!');
+                return;
+            }
+
+            document.getElementById('kwitansiNo').innerText = 'KW-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('kwitansiName').innerText = u.name;
+            document.getElementById('kwitansiWa').innerText = activeUser + ' (' + (u.wa || '-') + ')';
+            document.getElementById('kwitansiBankInfo').innerText = u.bankType + ' (' + u.bankNo + ')';
+            document.getElementById('kwitansiPackageTenor').innerText = (u.selectedPackage || 'MINGGUAN') + ' (' + (u.selectedTenor || '14 Hari') + ')';
+            document.getElementById('kwitansiPrincipal').innerText = 'Rp ' + u.activeLoan.toLocaleString('id-ID');
+            document.getElementById('kwitansiInterest').innerText = 'Rp ' + u.bunga.toLocaleString('id-ID');
+            document.getElementById('kwitansiTotal').innerText = 'Rp ' + (u.activeLoan + u.bunga).toLocaleString('id-ID');
+            document.getElementById('kwitansiApproveTime').innerText = u.approveDate || '-';
+            document.getElementById('kwitansiDueTime').innerText = u.dueDate || '-';
+
+            document.getElementById('kwitansiModal').style.display = 'flex';
+        }
+
+        function closeKwitansiModal() {
+            document.getElementById('kwitansiModal').style.display = 'none';
+        }
+
+        // KELOLA AKUN
+        function editUserPassword(userId) {
+            let newPass = prompt("Masukkan Password Baru (min 5 karakter) untuk User ID: " + userId, usersData[userId].password);
+            if (newPass !== null && newPass.trim() !== "") {
+                if (newPass.trim().length < 5) {
+                    alert("❌ Password minimal 5 karakter!");
+                    return;
+                }
+                usersData[userId].password = newPass.trim();
+                saveDataToStorage();
+                alert("✅ Password nasabah " + userId + " berhasil diubah!");
+                renderAdminView();
+            }
+        }
+
+        function resetUserPassword(userId) {
+            if (confirm("Reset password nasabah " + userId + " ke password default '123456'?")) {
+                usersData[userId].password = '123456';
+                saveDataToStorage();
+                alert("✅ Password berhasil direset menjadi: 123456");
+                renderAdminView();
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Apakah Anda yakin ingin menghapus akun nasabah ' + userId + ' dari database?')) {
+                delete usersData[userId];
+                saveDataToStorage();
+                renderAdminView();
+            }
+        }
+
+        function updateCompanyCash() {
+            let val = parseFloat(document.getElementById('adminCashInput').value);
+            if (val) {
+                companyCash = val;
+                saveDataToStorage();
+                renderAdminView();
+                alert('Kas Perusahaan Berhasil Diperbarui!');
+            }
+        }
+
+        function updateQrisUrl() {
+            let url = document.getElementById('adminQrisUrlInput').value.trim();
+            if (url) {
+                qrisImgUrl = url;
+                saveDataToStorage();
+                alert('URL Gambar QRIS Berhasil Diperbarui!');
+            }
+        }
+
+        // LIVE CHAT
+        function toggleChat() {
+            let box = document.getElementById('chatBox');
+            box.style.display = (box.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function handleChatKey(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            let input = document.getElementById('chatInput');
+            let text = input.value.trim();
+            if (text === '') return;
+
+            let msgContainer = document.getElementById('chatMessages');
+            let userMsg = document.createElement('div');
+            userMsg.className = 'msg msg-user';
+            userMsg.innerText = text;
+            msgContainer.appendChild(userMsg);
+
+            input.value = '';
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+
+            setTimeout(() => {
+                let csMsg = document.createElement('div');
+                csMsg.className = 'msg msg-cs';
+                csMsg.innerText = 'Pesan Anda telah diterima. Untuk bantuan kilat, hubungi CS WA 082345546286.';
+                msgContainer.appendChild(csMsg);
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
